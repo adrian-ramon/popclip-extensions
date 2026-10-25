@@ -1,0 +1,4 @@
+include:
+  - NumberToWords.popclipext
+  - CharacterMap.popclipext
+versionPrefix: v

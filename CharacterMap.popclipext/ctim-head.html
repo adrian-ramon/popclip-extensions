@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character Map</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --fg: #15171a; --muted: #5f6670; --tile: #ffffff; --border: #d9dde3;
+    --upper: #0a6cff; --lower: #00a36c; --digit: #b05cff; --symbol: #ff7a00; --space: #8a94a3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #16181c; --fg: #f1f3f5; --muted: #9aa3ae; --tile: #22252b; --border: #353a42;
+      --upper: #4d94ff; --lower: #1fd18f; --digit: #c88bff; --symbol: #ff9a3d; --space: #8a94a3; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 40px; background: var(--bg); color: var(--fg);
+    font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 15px; font-weight: 600; color: var(--muted); margin: 0 0 8px; text-transform: uppercase; letter-spacing: .06em; }
+  .source { font: 600 28px/1.3 "SF Mono", Menlo, monospace; word-break: break-all; margin: 0 0 12px; }
+  .source span { border-radius: 4px; padding: 0 1px; }
+  .summary { color: var(--muted); margin: 0 0 16px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 24px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+  .legend i { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
+  .groups { display: flex; flex-wrap: wrap; gap: 20px; }
+  .group { display: flex; gap: 8px; padding: 8px; border-radius: 12px; background: color-mix(in srgb, var(--border) 45%, transparent); }
+  .tile { position: relative; width: 104px; border-radius: 10px; background: var(--tile); border: 1px solid var(--border);
+    border-top: 8px solid var(--c); padding: 6px 6px 8px; text-align: center; }
+  .idx { font: 600 13px "SF Mono", Menlo, monospace; color: var(--muted); }
+  .ch { font: 700 44px/1.1 "SF Mono", Menlo, monospace; color: var(--c); margin: 2px 0; min-height: 48px; }
+  .word { font-size: 14px; font-weight: 600; line-height: 1.2; min-height: 34px; }
+  .kind { display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; color: #fff; background: var(--c); border-radius: 999px; padding: 2px 8px; }
+  .warn { position: absolute; top: 4px; right: 6px; font-size: 13px; }
+  .t-upper { --c: var(--upper); } .t-lower { --c: var(--lower); } .t-digit { --c: var(--digit); }
+  .t-symbol { --c: var(--symbol); } .t-space { --c: var(--space); }
+  .t-symbol .kind, .t-lower .kind { color: #111; }
+  .tile { cursor: pointer; transition: opacity .15s, transform .15s, box-shadow .15s; }
+  .tile.done { opacity: .3; }
+  .tile.current { transform: scale(1.12); z-index: 1; border-color: var(--c);
+    box-shadow: 0 0 0 4px var(--c), 0 8px 24px rgba(0,0,0,.25); }
+  .source span.done { opacity: .3; }
+  .source span.current { background: var(--c); color: #fff !important; }
+  .stepper { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+    margin: 0 -16px 20px; padding: 10px 16px; background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(6px); border-bottom: 1px solid var(--border); }
+  .progress { font: 700 18px "SF Mono", Menlo, monospace; min-width: 80px; }
+  .keys { color: var(--muted); font-size: 13px; }
+  kbd { font: 600 12px "SF Mono", Menlo, monospace; border: 1px solid var(--border); border-bottom-width: 2px;
+    border-radius: 5px; padding: 1px 6px; background: var(--tile); color: var(--fg); }
+  .note { color: var(--muted); margin-top: 24px; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Character map</h1>
+  <p class="source" id="source"></p>
+  <p class="summary" id="summary"></p>
+  <div class="legend">
+    <span><i style="background:var(--upper)"></i>Capital</span>
+    <span><i style="background:var(--lower)"></i>Lower case</span>
+    <span><i style="background:var(--digit)"></i>Digit</span>
+    <span><i style="background:var(--symbol)"></i>Symbol</span>
+    <span><i style="background:var(--space)"></i>Space</span>
+    <span>⚠ Easily confused</span>
+  </div>
+  <div class="stepper">
+    <span class="progress" id="progress">Ready</span>
+    <span class="keys"><kbd>Space</kbd> or <kbd>→</kbd> next · <kbd>←</kbd> back · <kbd>Esc</kbd> start again · click a tile to jump there</span>
+  </div>
+  <div class="groups" id="groups"></div>
+  <p class="note">This page was made on your Mac and its file is deleted 30 seconds after opening, so reloading won't work. Nothing was sent anywhere.</p>
+</main>
+<script>
+const TEXT = 
