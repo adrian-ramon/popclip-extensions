@@ -201,7 +201,10 @@ function convertText(text, cap, decimalComma) {
 }
 
 if (typeof popclip !== "undefined") {
-  const result = convertText(popclip.input.text, popclip.options.capitalise, popclip.options.decimal === "comma");
+  // Older PopClip versions have no localeInfo, so fall back to a full stop
+  const locale = typeof util !== "undefined" && util.localeInfo ? util.localeInfo.decimalSeparator : ".";
+  const mark = popclip.options.decimal === "auto" ? locale : popclip.options.decimal;
+  const result = convertText(popclip.input.text, popclip.options.capitalise, mark === "comma" || mark === ",");
   if (result === null) {
     popclip.showText("No number found");
   } else if (popclip.modifiers.option) {

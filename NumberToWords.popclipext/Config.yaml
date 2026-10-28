@@ -15,9 +15,9 @@ options:
   - identifier: decimal
     label: Decimal separator
     type: multiple
-    values: [point, comma]
-    value labels: ["Full stop (1,234.56)", "Comma (1.234,56)"]
-    defaultValue: point
+    values: [auto, point, comma]
+    value labels: ["Same as my Mac", "Full stop (1,234.56)", "Comma (1.234,56)"]
+    defaultValue: auto
   - identifier: capitalise
     label: Capitalise first letter
     type: boolean
