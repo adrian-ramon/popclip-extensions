@@ -1,4 +1,11 @@
-# PopClip extension: show each selected character as a numbered, colour-coded tile with its spoken name
+# Character Map — PopClip extension
+# Author:  Adrian Ramon
+# Version: 1.0 (24 October 2026)
+# Licence: MIT
+#
+# Shows each selected character as a numbered, colour-coded tile with its
+# spoken name (NATO alphabet for letters), for reading text aloud. ctim.sh
+# builds the page from ctim-head.html, the selected text and ctim-tail.html.
 name: Character Map
 identifier: com.adrianramon.popclip.character-map
 description: Spell out selected text character by character, with capitals, digits and symbols colour-coded and named, for reading aloud.

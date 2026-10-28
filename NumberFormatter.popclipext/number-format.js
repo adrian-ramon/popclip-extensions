@@ -1,9 +1,35 @@
-// Adds (or converts) thousands separators in selected numbers: "12345678.9" -> "12,345,678.9"
-// Understands numbers already grouped in another style, e.g. "1.234.567,89" or "12,34,567"
+/*
+ * Number Formatter — PopClip extension
+ * ------------------------------------
+ * Author:      Adrian Ramon
+ * Version:     1.0
+ * Date:        28 October 2026
+ * Licence:     MIT (see LICENSE in the repository root)
+ * Repository:  https://github.com/adrian-ramon/popclip-extensions
+ *
+ * Adds (or converts) thousands separators in selected numbers:
+ *
+ *   12345678.9     →  12,345,678.9     (UK, US)
+ *   1.234.567,89   →  1,234,567.89     (converted from German style)
+ *   1234567        →  12,34,567        (Indian lakh style, if chosen)
+ *
+ * By default it follows the number format set on the Mac. In longer text,
+ * every standalone number is formatted, while years, phone numbers, codes,
+ * dates, times, ranges, versions, IP addresses and lists are left alone.
+ *
+ * Everything runs locally; no data leaves the Mac.
+ */
 
+// ---------------------------------------------------------------------------
+// Number styles
+// ---------------------------------------------------------------------------
+
+// Characters treated as spaces when grouping (ordinary, no-break, thin and
+// narrow no-break), and the straight and curly apostrophes used in Switzerland.
 const SPACES = "    ";
 const APOSTROPHES = "'’";
 
+// The styles offered in the "Number style" option.
 const STYLES = {
   comma: { group: ",", decimal: "." },
   dot: { group: ".", decimal: "," },
@@ -12,6 +38,7 @@ const STYLES = {
   apostrophe: { group: "’", decimal: "." },
   indian: { group: ",", decimal: ".", indian: true },
 };
+// The characters behind the "Space to use in space styles" option.
 const SPACE_CHARS = { thin: " ", nbsp: " ", plain: " " };
 
 // Separators from macOS settings (older PopClip builds without util.localeInfo fall back to Intl);
@@ -37,6 +64,8 @@ function systemStyle(info) {
   return { group, decimal, indian };
 }
 
+// Combines the PopClip options with the Mac's settings into one style object.
+// The Mac's decimal mark is kept too, to resolve ambiguous numbers like 1,234.
 function resolveStyle(options, info) {
   const sys = systemStyle(info);
   const chosen = STYLES[options.style] || sys;
@@ -45,6 +74,10 @@ function resolveStyle(options, info) {
   style.ungroupFour = Boolean(options.ungroupFour);
   return style;
 }
+
+// ---------------------------------------------------------------------------
+// Reading existing numbers
+// ---------------------------------------------------------------------------
 
 // Western 1,234,567 with any separator, or Indian 12,34,567 with commas only
 function validGroups(parts, sep) {
@@ -56,6 +89,8 @@ function validGroups(parts, sep) {
   return sep === "," && first.length <= 2 && rest.every((p) => p.length === 2);
 }
 
+// Whether a character is one of the spaces, and whether two separators are
+// the same kind (any two spaces, or any two apostrophes, count as the same).
 function isSpace(c) { return SPACES.includes(c); }
 function sameKind(a, b) { return a === b || (isSpace(a) && isSpace(b)) || (APOSTROPHES.includes(a) && APOSTROPHES.includes(b)); }
 
@@ -103,6 +138,12 @@ function interpret(num, style, inText) {
   return isDecimal ? { intPart: left, fracPart: right } : { intPart: left + right, fracPart: "" };
 }
 
+// ---------------------------------------------------------------------------
+// Formatting
+// ---------------------------------------------------------------------------
+
+// Inserts the style's grouping mark into a whole-number digit string, in
+// threes or, for the Indian style, threes then twos.
 function groupDigits(digits, style) {
   if (digits.length <= 3 || (digits.length === 4 && style.ungroupFour)) return digits;
   const head = digits.slice(0, -3);
@@ -123,6 +164,11 @@ function formatNumber(num, style, inText) {
   return groupDigits(p.intPart, style) + (p.fracPart ? style.decimal + p.fracPart : "");
 }
 
+// ---------------------------------------------------------------------------
+// Finding numbers in the selection
+// ---------------------------------------------------------------------------
+
+// Every grouping or decimal mark a number might contain.
 const SEP_CLASS = ",.'’   ";
 // Selection that is just one number, optionally with a sign, currency or unit around it
 const WHOLE = new RegExp("^([^\\p{L}\\d]*(?:\\p{Lu}{3}\\s?)?[^\\p{L}\\d]*?)(\\d(?:[" + SEP_CLASS + " ]?\\d)*)([^\\p{L}\\d]*(?:\\s?\\p{L}{1,3})?[^\\p{L}\\d]*)$", "u");
@@ -145,6 +191,13 @@ function convertText(text, style) {
   return out === text ? null : out;
 }
 
+// ---------------------------------------------------------------------------
+// PopClip action
+// ---------------------------------------------------------------------------
+
+// Inside PopClip: format the selection and deliver it. A plain click uses the
+// "Plain click" option; ⌥-click always replaces the selection and ⇧-click
+// always shows the result. Outside PopClip (Node), export for testing.
 if (typeof popclip !== "undefined") {
   const style = resolveStyle(popclip.options, typeof util !== "undefined" ? util.localeInfo : null);
   const result = convertText(popclip.input.text, style);

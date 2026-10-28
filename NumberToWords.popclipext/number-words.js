@@ -1,11 +1,39 @@
-// Converts a selected number or currency amount to British English words.
-// Mirrors TextFormatter: "£1,234.5" -> "One thousand, two hundred and thirty-four pounds and fifty pence"
+/*
+ * Number to Words — PopClip extension
+ * -----------------------------------
+ * Author:      Adrian Ramon
+ * Version:     1.1
+ * Date:        28 October 2026
+ * Licence:     MIT (see LICENSE in the repository root)
+ * Repository:  https://github.com/adrian-ramon/popclip-extensions
+ *
+ * Spells out a selected number or currency amount in British English words:
+ *
+ *   £1,234.5   →  One thousand, two hundred and thirty-four pounds and fifty pence
+ *   -42        →  Minus forty-two
+ *   3.14       →  Three point one four
+ *   12%        →  Twelve per cent
+ *
+ * A selection that is only a number becomes just its words. In longer text,
+ * every standalone number is converted, while dates, times, ranges, version
+ * numbers, phone numbers and codes are left alone. Numbers grouped in other
+ * countries' styles (1.234.567,89, 1 234 567, 1’234’567, 12,34,567) are
+ * understood too.
+ *
+ * Everything runs locally; no data leaves the Mac.
+ */
 
+// ---------------------------------------------------------------------------
+// Word tables
+// ---------------------------------------------------------------------------
+
+// Words for 0 to 19, and for each multiple of ten up to ninety.
 const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
   "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
   "eighteen", "nineteen"];
 const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
-// Short scale, as used in the UK since 1974; same names as TextFormatter (up to centillion)
+// Names for each group of three digits. Short scale (a billion is a thousand
+// million), as used in the UK since 1974, all the way up to centillion (10^303).
 const SCALES = [
   "", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion",
   "septillion", "octillion", "nonillion", "decillion", "undecillion", "duodecillion",
@@ -34,18 +62,26 @@ const SCALES = [
   "septennonagintillion", "octononagintillion", "novemnonagintillion", "centillion"
 ];
 
+// Currency names, singular and plural, for the whole and fractional units.
 const CURRENCIES = {
   GBP: { major: ["pound", "pounds"], minor: ["penny", "pence"] },
   USD: { major: ["dollar", "dollars"], minor: ["cent", "cents"] },
   EUR: { major: ["euro", "euros"], minor: ["cent", "cents"] },
 };
+// Currency symbols and the ISO codes they stand for.
 const SYMBOLS = { "£": "GBP", "$": "USD", "€": "EUR" };
 
+// ---------------------------------------------------------------------------
+// Spelling out whole numbers
+// ---------------------------------------------------------------------------
+
+// 0 to 99: "seven", "nineteen", "forty-two".
 function underHundred(n) {
   if (n < 20) return ONES[n];
   return TENS[Math.floor(n / 10)] + (n % 10 ? "-" + ONES[n % 10] : "");
 }
 
+// 0 to 999, with the British "and" after the hundreds: "three hundred and six".
 function underThousand(n) {
   const hundreds = Math.floor(n / 100);
   const rest = n % 100;
@@ -55,7 +91,8 @@ function underThousand(n) {
   return parts.join(" and ");
 }
 
-// Whole number given as a digit string, so values beyond 2^53 stay exact
+// Whole number given as a digit string, so values beyond 2^53 stay exact.
+// Each group of three digits is spelt out and given its scale name.
 function integerToWords(digits) {
   digits = digits.replace(/^0+(?=\d)/, "");
   if (/^0+$/.test(digits)) return "zero";
@@ -79,7 +116,12 @@ function integerToWords(digits) {
   return parts.join(", ");
 }
 
-// Round a digit string pair to two decimal places without floating-point error
+// ---------------------------------------------------------------------------
+// Currency rounding
+// ---------------------------------------------------------------------------
+
+// Rounds a whole/fraction digit-string pair to two decimal places (pence or
+// cents) without floating-point error, carrying into the whole part if needed.
 function roundToPence(intPart, fracPart) {
   const frac = (fracPart + "000").slice(0, 3);
   let pence = Number(frac.slice(0, 2)) + (Number(frac[2]) >= 5 ? 1 : 0);
@@ -90,6 +132,7 @@ function roundToPence(intPart, fracPart) {
   return [intPart, pence];
 }
 
+// Adds one to a digit string: "199" → "200", "999" → "1000".
 function incrementDigits(digits) {
   const arr = digits.split("");
   let i = arr.length - 1;
@@ -97,6 +140,10 @@ function incrementDigits(digits) {
   if (i < 0) arr.unshift("1"); else arr[i] = String(Number(arr[i]) + 1);
   return arr.join("");
 }
+
+// ---------------------------------------------------------------------------
+// Reading the selected number
+// ---------------------------------------------------------------------------
 
 // Separators people use to group thousands: comma, full stop, apostrophe (Swiss) and spaces (French, SI)
 const SPACES = /[ \u00a0\u2009\u202f]/g;
@@ -133,6 +180,8 @@ function splitNumber(core, decimalComma) {
   return { intPart: whole.replace(/\D/g, ""), fracPart: frac };
 }
 
+// Reads a selection that is a single number or amount, with an optional minus
+// sign, currency symbol or code. Returns null if it isn't one.
 function parse(text, decimalComma) {
   const t = text.trim();
   const m = t.match(/^([-−])?\s*([£$€])?\s*([-−])?\s*(\d(?:[\d.,'’ \u00a0\u2009\u202f]*\d)?)\s*(GBP|USD|EUR)?$/i);
@@ -143,6 +192,12 @@ function parse(text, decimalComma) {
   return { negative: Boolean(m[1] || m[3]), currency: code, ...parts };
 }
 
+// ---------------------------------------------------------------------------
+// Converting to words
+// ---------------------------------------------------------------------------
+
+// Turns one number or amount into words. Plain numbers read their decimals
+// digit by digit ("point one four"); amounts round to pence or cents.
 function toWords(text, decimalComma) {
   const p = parse(text, decimalComma);
   if (!p) throw new Error("Not a number");
@@ -165,9 +220,14 @@ function toWords(text, decimalComma) {
   return sign + parts.join(" and ");
 }
 
+// Upper-cases the first letter.
 function capitalise(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+// ---------------------------------------------------------------------------
+// Numbers inside longer text
+// ---------------------------------------------------------------------------
 
 // Number shapes accepted inside running text. Plain spaces and repeated full stops are left out,
 // because in text they are more often lists, phone numbers or IP addresses than grouping.
@@ -200,6 +260,13 @@ function convertText(text, cap, decimalComma) {
   return count ? out : null;
 }
 
+// ---------------------------------------------------------------------------
+// PopClip action
+// ---------------------------------------------------------------------------
+
+// Inside PopClip: convert the selection and deliver it. A plain click uses the
+// "Plain click" option; ⌥-click always replaces the selection and ⇧-click
+// always shows the result. Outside PopClip (Node), export for testing.
 if (typeof popclip !== "undefined") {
   // Older PopClip versions have no localeInfo, so fall back to a full stop
   const locale = typeof util !== "undefined" && util.localeInfo ? util.localeInfo.decimalSeparator : ".";
