@@ -1,4 +1,5 @@
 include:
   - NumberToWords.popclipext
   - CharacterMap.popclipext
+  - NumberFormatter.popclipext
 versionPrefix: v
