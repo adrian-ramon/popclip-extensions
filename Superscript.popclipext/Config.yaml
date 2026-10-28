@@ -1,0 +1,22 @@
+# Superscript — PopClip extension
+# Author:  Adrian Ramon
+# Version: 1.0 (28 October 2026)
+# Licence: MIT
+#
+# Two buttons, x² and x₂, that turn selected text into Unicode superscript or
+# subscript characters (m3 → m³, CO2 → CO₂). The logic is in superscript.js,
+# which also decides when each button appears.
+name: Superscript
+identifier: com.adrianramon.popclip.superscript
+description: Superscript and subscript anywhere you can type, with smart fixes for units and formulas (m3 → m³, CO2 → CO₂, x^2 → x²).
+keywords: superscript subscript exponent power square cubic metres units chemical formula chemistry maths index unicode
+icon: 'svg:<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 26l26 30M32 26L6 56"/><path d="M41 15a7 7 0 1 1 12 5L41 32h15"/></g></svg>'
+popclip version: 4151
+options:
+  - identifier: output
+    label: Plain click
+    type: multiple
+    values: [paste, copy, show]
+    value labels: [Replace selection, Copy result to clipboard, Show result in PopClip]
+    defaultValue: paste
+module: superscript.js
