@@ -19,7 +19,7 @@ Everything happens on your Mac. The page is written to a temporary file, opened,
 
 ## Author
 
-Adrian Ramon. Based on the Character-to-Index Mapping feature in TextFormatter.
+Adrian Ramon.
 
 ## Changelog
 

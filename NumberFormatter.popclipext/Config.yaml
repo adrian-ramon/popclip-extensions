@@ -1,10 +1,19 @@
-# PopClip extension: add or convert thousands separators in selected numbers
+# Number Formatter — PopClip extension
+# Author:  Adrian Ramon
+# Version: 1.0 (28 October 2026)
+# Licence: MIT
+#
+# Adds or converts thousands separators in selected numbers
+# (12345678 → 12,345,678), using the Mac's number format or a chosen style.
+# The logic is in number-format.js.
 name: Number Formatter
 identifier: com.adrianramon.popclip.number-formatter
 description: Add thousands separators to numbers (12345678 → 12,345,678), using your Mac's number format or a style you choose.
 keywords: number format thousands separator grouping comma decimal locale lakh swiss european
 icon: 'svg:<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 26l5-4v24"/><path d="M19 44v6l-3 4"/><ellipse cx="30" cy="34" rx="4.5" ry="11"/><ellipse cx="44" cy="34" rx="4.5" ry="11"/><ellipse cx="58" cy="34" rx="4.5" ry="11"/></g></svg>'
 popclip version: 4151
+# Show the button only when the selection has four digits in a row, or digits
+# either side of a separator.
 regex: '\d{4}|\d[^\w\n]\d'
 options:
   - identifier: style

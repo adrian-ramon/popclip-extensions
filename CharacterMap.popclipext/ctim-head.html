@@ -1,10 +1,20 @@
 <!doctype html>
+<!--
+  Character Map — PopClip extension
+  Author:  Adrian Ramon
+  Version: 1.0 (24 October 2026)
+  Licence: MIT (see LICENSE in the repository root)
+
+  First half of the character map page: styles and page layout. ctim.sh
+  follows this with the selected text as a JSON string, then ctim-tail.html.
+-->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Character Map</title>
 <style>
+  /* Colours: one per kind of character, with a dark-mode set */
   :root {
     --bg: #f4f5f7; --fg: #15171a; --muted: #5f6670; --tile: #ffffff; --border: #d9dde3;
     --upper: #0a6cff; --lower: #00a36c; --digit: #b05cff; --symbol: #ff7a00; --space: #8a94a3;
@@ -13,6 +23,7 @@
     :root { --bg: #16181c; --fg: #f1f3f5; --muted: #9aa3ae; --tile: #22252b; --border: #353a42;
       --upper: #4d94ff; --lower: #1fd18f; --digit: #c88bff; --symbol: #ff9a3d; --space: #8a94a3; }
   }
+  /* Page, typed-out source line, summary and legend */
   * { box-sizing: border-box; }
   body { margin: 0; padding: 24px 16px 40px; background: var(--bg); color: var(--fg);
     font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
@@ -24,6 +35,7 @@
   .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 24px; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
   .legend i { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
+  /* Tiles, in groups of four */
   .groups { display: flex; flex-wrap: wrap; gap: 20px; }
   .group { display: flex; gap: 8px; padding: 8px; border-radius: 12px; background: color-mix(in srgb, var(--border) 45%, transparent); }
   .tile { position: relative; width: 104px; border-radius: 10px; background: var(--tile); border: 1px solid var(--border);
@@ -37,12 +49,14 @@
   .t-upper { --c: var(--upper); } .t-lower { --c: var(--lower); } .t-digit { --c: var(--digit); }
   .t-symbol { --c: var(--symbol); } .t-space { --c: var(--space); }
   .t-symbol .kind, .t-lower .kind { color: #111; }
+  /* Read-out mode: characters already read fade, the current one is enlarged */
   .tile { cursor: pointer; transition: opacity .15s, transform .15s, box-shadow .15s; }
   .tile.done { opacity: .3; }
   .tile.current { transform: scale(1.12); z-index: 1; border-color: var(--c);
     box-shadow: 0 0 0 4px var(--c), 0 8px 24px rgba(0,0,0,.25); }
   .source span.done { opacity: .3; }
   .source span.current { background: var(--c); color: #fff !important; }
+  /* Sticky bar with progress and keyboard help */
   .stepper { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
     margin: 0 -16px 20px; padding: 10px 16px; background: color-mix(in srgb, var(--bg) 92%, transparent);
     backdrop-filter: blur(6px); border-bottom: 1px solid var(--border); }
@@ -74,4 +88,5 @@
   <p class="note">This page was made on your Mac and its file is deleted 30 seconds after opening, so reloading won't work. Nothing was sent anywhere.</p>
 </main>
 <script>
+// The selected text, inserted here by ctim.sh
 const TEXT = 

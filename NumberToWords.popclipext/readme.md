@@ -32,7 +32,7 @@ Everything runs locally inside PopClip. No data is sent anywhere.
 
 ## Author
 
-Adrian Ramon. Based on the number formatter in TextFormatter.
+Adrian Ramon.
 
 ## Changelog
 
