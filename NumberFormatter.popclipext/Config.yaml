@@ -1,0 +1,39 @@
+# PopClip extension: add or convert thousands separators in selected numbers
+name: Number Formatter
+identifier: com.adrianramon.popclip.number-formatter
+description: Add thousands separators to numbers (12345678 → 12,345,678), using your Mac's number format or a style you choose.
+keywords: number format thousands separator grouping comma decimal locale lakh swiss european
+icon: 'svg:<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 26l5-4v24"/><path d="M19 44v6l-3 4"/><ellipse cx="30" cy="34" rx="4.5" ry="11"/><ellipse cx="44" cy="34" rx="4.5" ry="11"/><ellipse cx="58" cy="34" rx="4.5" ry="11"/></g></svg>'
+popclip version: 4151
+regex: '\d{4}|\d[^\w\n]\d'
+options:
+  - identifier: style
+    label: Number style
+    type: multiple
+    values: [system, comma, dot, space-comma, space-point, apostrophe, indian]
+    value labels:
+      - Same as my Mac
+      - "1,234,567.89 (UK, US)"
+      - "1.234.567,89 (Germany, Italy)"
+      - "1 234 567,89 (France, Nordics)"
+      - "1 234 567.89 (SI, scientific)"
+      - "1’234’567.89 (Switzerland)"
+      - "12,34,567.89 (India, lakh)"
+    defaultValue: system
+  - identifier: space
+    label: Space to use in space styles
+    type: multiple
+    values: [thin, nbsp, plain]
+    value labels: [Thin non-breaking space, Non-breaking space, Ordinary space]
+    defaultValue: thin
+  - identifier: ungroupFour
+    label: Leave four-digit numbers as 1234
+    type: boolean
+    defaultValue: false
+  - identifier: output
+    label: Plain click
+    type: multiple
+    values: [paste, copy, show]
+    value labels: [Replace selection, Copy result to clipboard, Show result in PopClip]
+    defaultValue: paste
+javascript file: number-format.js
