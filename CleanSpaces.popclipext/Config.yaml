@@ -1,0 +1,39 @@
+# Clean Spaces — PopClip extension
+# Author:  Adrian Ramon
+# Version: 1.0 (29 October 2026)
+# Licence: MIT
+#
+# One button that tidies the spacing in selected text: double spaces, stray
+# tabs, spaces at the ends of lines, non-breaking and other odd Unicode
+# spaces, invisible zero-width characters and runs of blank lines.
+# The logic is in clean-spaces.js, which also decides when the button appears.
+name: Clean Spaces
+identifier: com.adrianramon.popclip.clean-spaces
+description: Tidy the spacing in text copied from the web, PDFs and emails: double spaces, non-breaking and invisible characters, trailing spaces and extra blank lines.
+keywords: clean spaces whitespace double space tidy trim tabs non-breaking nbsp zero-width invisible blank lines normalise
+icon: 'svg:<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 36v14h40V36"/></g><path d="M52 3q2 9 10 11q-8 2-10 11q-2-9-10-11q8-2 10-11z"/></svg>'
+popclip version: 4151
+options:
+  - identifier: blankLines
+    label: Blank lines
+    type: multiple
+    values: [single, remove, keep]
+    value labels: [At most one in a row, Remove all, Leave as they are]
+    defaultValue: single
+  - identifier: punctuation
+    label: Remove spaces before punctuation
+    description: "word , word → word, word and ( word ) → (word)"
+    type: boolean
+    defaultValue: true
+  - identifier: indent
+    label: Keep indentation at the start of lines
+    description: Useful for code and indented lists.
+    type: boolean
+    defaultValue: false
+  - identifier: output
+    label: Plain click
+    type: multiple
+    values: [paste, copy, show]
+    value labels: [Replace selection, Copy result to clipboard, Show result in PopClip]
+    defaultValue: paste
+module: clean-spaces.js

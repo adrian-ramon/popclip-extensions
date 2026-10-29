@@ -3,4 +3,5 @@ include:
   - CharacterMap.popclipext
   - NumberFormatter.popclipext
   - Superscript.popclipext
+  - CleanSpaces.popclipext
 versionPrefix: v
