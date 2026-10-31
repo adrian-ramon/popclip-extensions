@@ -4,4 +4,5 @@ include:
   - NumberFormatter.popclipext
   - Superscript.popclipext
   - CleanSpaces.popclipext
+  - WordsToNumbers.popclipext
 versionPrefix: v
