@@ -1,0 +1,35 @@
+# Words to Numbers — PopClip extension
+# Author:  Adrian Ramon
+# Version: 1.0 (31 October 2026)
+# Licence: MIT
+#
+# Turns numbers written in English words back into digits
+# (two thousand and five → 2005, twelve pounds and thirty pence → £12.30).
+# The reverse of Number to Words. The logic is in words-numbers.js, which
+# also decides when the button appears.
+name: Words to Numbers
+identifier: com.adrianramon.popclip.words-to-numbers
+description: "Turn numbers written in words into digits: two thousand and five → 2005, twelve pounds fifty → £12.50, on their own or inside a sentence."
+keywords: words to numbers digits figures numerals convert spelt out british english pounds pence per cent ordinal year
+icon: 'svg:<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20h14M5 31h14M5 42h10"/><path d="M24 31h10M30 26l5 5-5 5"/><path d="M42 20l7-6v34M42 48h14"/></g></svg>'
+popclip version: 4151
+options:
+  - identifier: output
+    label: Plain click
+    type: multiple
+    values: [paste, copy, show]
+    value labels: [Replace selection with digits, Copy digits to clipboard, Show digits in PopClip]
+    defaultValue: paste
+  - identifier: grouping
+    label: Thousands separator
+    type: multiple
+    values: [auto, always, never]
+    value labels: ["From 10,000 and in money (2005, 12,500, £1,500)", "Always (2,005)", "Never (12500)"]
+    defaultValue: auto
+  - identifier: decimal
+    label: Decimal separator
+    type: multiple
+    values: [auto, point, comma]
+    value labels: ["Same as my Mac", "Full stop (1,234.56)", "Comma (1.234,56)"]
+    defaultValue: auto
+module: words-numbers.js
